@@ -1,0 +1,17 @@
+package com.decoder.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.decoder.model.Job;
+
+public interface JobRepository extends JpaRepository<Job, Long> {
+	
+//	 List<Job> findByVisibleTrue();
+//	List<Job> findByRecruiterId(Long recruiterId);
+	
+    @Query("SELECT j FROM Job j WHERE j.companyId.email = :email")
+    List<Job> findByRecruiterEmail(String email);
+}

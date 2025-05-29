@@ -1,0 +1,126 @@
+package com.decoder.controller;
+
+import com.decoder.dto.JobDTO;
+import com.decoder.mapper.JobMapper;
+import com.decoder.model.Job;
+import com.decoder.model.JobResponseDTO;
+import com.decoder.model.Recruiter;
+import com.decoder.repository.JobRepository;
+import com.decoder.repository.RecruiterRepository;
+import com.decoder.service.JobService;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
+@CrossOrigin(origins = "http://localhost:5173")
+@RestController
+@RequestMapping("/api/jobs")
+public class JobController {
+
+    @Autowired
+    private JobService jobService;
+    
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private RecruiterRepository recruiterRepository;
+
+    @PostMapping
+    public ResponseEntity<Job> addJob(@RequestBody Job job) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Object principal = authentication.getPrincipal();
+        String email;
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else {
+            email = principal.toString(); // fallback
+        }
+
+        // Fetch recruiter by email using Optional
+        Optional<Recruiter> recruiterOpt = recruiterRepository.findByEmail(email);
+        if (!recruiterOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Recruiter recruiter = recruiterOpt.get();
+        job.setCompanyId(recruiter); // associate recruiter with job
+        job.setDate(LocalDateTime.now()); // ✅ set the current date-time
+        job.setApplicants(0);
+        Job savedJob = jobService.saveJob(job);
+        return ResponseEntity.ok(savedJob);
+    }
+
+//    @GetMapping
+//    public List<Job> getAllJobs() {
+//        return jobService.getAllJobs();
+//    }
+    
+    @GetMapping
+    public List<JobDTO> getAllJobs() {
+        List<Job> jobs = jobRepository.findAll();
+        return jobs.stream()
+                .map(JobMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+    
+    @GetMapping("/recruiter")
+    public List<JobDTO> getRecruiterJobs(Authentication authentication) {
+        String recruiterEmail = authentication.getName(); // from JWT token
+        return jobService.getJobsByRecruiter(recruiterEmail);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<JobResponseDTO> getJobById(@PathVariable Long id) {
+        Job job = jobService.getJobById(id);
+        return job != null ? ResponseEntity.ok(new JobResponseDTO(job)) : ResponseEntity.notFound().build();
+    }
+    
+//    @DeleteMapping("/api/jobs/{id}")
+//    public ResponseEntity<?> deleteJob(@PathVariable Long id) {
+//        try {
+//            jobService.deleteJobById(id);
+//            return ResponseEntity.ok("Job deleted successfully");
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//        }
+//    }
+    
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('RECRUITER')") // Optional: Restrict access
+    public ResponseEntity<?> deleteJob(@PathVariable Long id) {
+        jobService.deleteJobById(id);
+        return ResponseEntity.ok("Job deleted successfully");
+    }
+
+    @PutMapping("/{id}/visibility")
+    public ResponseEntity<?> updateVisibility(
+            @PathVariable Long id,
+            @RequestParam boolean visible) {
+        jobService.updateJobVisibility(id, visible);
+        return ResponseEntity.ok("Visibility updated");
+    }
+
+//    @GetMapping("/public")
+//    public List<Job> getVisibleJobs() {
+//        return jobRepository.findByVisibleTrue();
+//    }
+
+}
