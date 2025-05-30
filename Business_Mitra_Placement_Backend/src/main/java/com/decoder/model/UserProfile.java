@@ -15,12 +15,10 @@ public class UserProfile {
     private User user;
 
     private String name;
-    private String degree;
-    private String university;
-    private String location;
     private String gender;
     private String dob;
-    private int phone;
+    private String location;
+    private String phone;
     private String email;
 
     
@@ -49,21 +47,21 @@ public class UserProfile {
     public void setName(String name) {
     	this.name = name;
     }
-    
-    public String getDegree() {
-    	return degree;
+       
+    public String getGender() {
+    	return gender;
     }
     
-    public void setDegree(String degree) {
-    	this.degree = degree;
+    public void setGender(String gender) {
+    	this.gender = gender;
     }
     
-    public String getUniversity() {
-    	return university;
+    public String getDob() {
+    	return dob;
     }
     
-    public void setUniversity(String university) {
-    	this.university = university;
+    public void setDob(String dob) {
+    	this.dob = dob;
     }
     
     public String getLocation() {
@@ -74,5 +72,20 @@ public class UserProfile {
     	this.location = location;
     }
     
+    public String getPhone() {
+    	return phone;
+    }
+    
+    public void setPhone(String phone) {
+    	this.phone = phone;
+    }
+    
+    public String getEmail() {
+    	return email;
+    }
+    
+    public void setEmail(String email) {
+    	this.email = email;
+    }
 }
 
