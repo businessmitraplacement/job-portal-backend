@@ -1,0 +1,5 @@
+package com.decoder.model;
+
+public class CareerPreference {
+
+}

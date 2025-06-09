@@ -18,7 +18,6 @@ public class UserProfileDTO {
         this.name = name;
     }
 
-
     public String getLocation() {
         return location;
     }
