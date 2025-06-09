@@ -1,5 +1,0 @@
-package com.decoder.repository;
-
-public interface CareerPreferenceRepository {
-
-}
