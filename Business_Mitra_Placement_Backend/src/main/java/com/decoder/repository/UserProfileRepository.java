@@ -11,6 +11,7 @@ import com.decoder.model.UserProfile;
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
 
 	Optional<UserProfile> findByUser(User user);
+	Optional<UserProfile> findByEmail(String email);
 }
 
 

@@ -7,6 +7,7 @@ public class UserProfileDTO {
     private String dob;
     private String phone;
     private String email;
+    private String profileImage;
 
     // Getters and Setters
 
@@ -56,5 +57,13 @@ public class UserProfileDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+    
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

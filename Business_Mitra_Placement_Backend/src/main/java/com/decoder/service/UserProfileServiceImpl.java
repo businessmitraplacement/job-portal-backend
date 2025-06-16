@@ -14,6 +14,9 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private UserProfileRepository profileRepo;
 
     @Autowired
     private UserProfileRepository profileRepository;
@@ -64,5 +67,14 @@ public class UserProfileServiceImpl implements UserProfileService {
         dto.setPhone(profile.getPhone());
         dto.setEmail(profile.getEmail());
         return dto;
+    }
+    
+    @Override
+    public void updateProfileImageByEmail(String email, String fileName) {
+        UserProfile profile = profileRepo.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        profile.setProfileImage(fileName); // assuming your entity has this field
+        profileRepo.save(profile);
     }
 }

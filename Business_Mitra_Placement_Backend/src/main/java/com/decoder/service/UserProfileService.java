@@ -7,4 +7,5 @@ public interface UserProfileService {
 	UserProfileDTO getProfileByEmail(String email);
 	UserProfileDTO saveOrUpdateProfileByEmail(String email, UserProfileDTO DTO);
 
+	 void updateProfileImageByEmail(String email, String fileName); 
 }
