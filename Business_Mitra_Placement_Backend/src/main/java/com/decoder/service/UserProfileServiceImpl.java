@@ -5,6 +5,9 @@ import com.decoder.model.User;
 import com.decoder.model.UserProfile;
 import com.decoder.repository.UserProfileRepository;
 import com.decoder.repository.UserRepository;
+
+import java.io.File;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -69,12 +72,35 @@ public class UserProfileServiceImpl implements UserProfileService {
         return dto;
     }
     
+//    @Override
+//    public void updateProfileImageByEmail(String email, String fileName) {
+//        UserProfile profile = profileRepo.findByEmail(email)
+//            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//
+//        profile.setProfileImage(fileName); // assuming your entity has this field
+//        profileRepo.save(profile);
+//    }
+    
     @Override
     public void updateProfileImageByEmail(String email, String fileName) {
         UserProfile profile = profileRepo.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        profile.setProfileImage(fileName); // assuming your entity has this field
+        // Directory where images are stored
+        String uploadDir = "uploads/";
+
+        // Delete old image if exists
+        String oldFileName = profile.getProfileImage();
+        if (oldFileName != null) {
+            File oldFile = new File(uploadDir + oldFileName);
+            if (oldFile.exists()) {
+                oldFile.delete();
+            }
+        }
+
+        // Update with new image
+        profile.setProfileImage(fileName);
         profileRepo.save(profile);
     }
+
 }
